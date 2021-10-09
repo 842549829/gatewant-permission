@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31717.71
+MinimumVisualStudioVersion = 15.0.26124.0
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C0A80C58-5227-4346-9394-02348B859F3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GateWayPermissionApi", "src\GateWayPermissionApi\GateWayPermissionApi.csproj", "{8F5F8A88-1499-4B08-82EA-2A3F2AE1E117}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8F5F8A88-1499-4B08-82EA-2A3F2AE1E117}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F5F8A88-1499-4B08-82EA-2A3F2AE1E117}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F5F8A88-1499-4B08-82EA-2A3F2AE1E117}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F5F8A88-1499-4B08-82EA-2A3F2AE1E117}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8F5F8A88-1499-4B08-82EA-2A3F2AE1E117} = {C0A80C58-5227-4346-9394-02348B859F3D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0FAEB33A-E2A6-42B6-A384-6D4CEB4A7D4B}
+	EndGlobalSection
+EndGlobal
