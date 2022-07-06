@@ -25,7 +25,7 @@
         {
             var logger = httpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("OcelotConfiguration");
             var downstreamRoute = httpContext.Items.DownstreamRoute();
-            if (httpContext.Request.Method.ToUpper() != "OPTIONS" && downstreamRoute.IsAuthenticated)
+            if (httpContext.Request.Method.ToUpper() != "OPTIONS" && downstreamRoute.IsAuthenticated && !string.IsNullOrWhiteSpace(downstreamRoute.AuthenticationOptions.AuthenticationProviderKey))
             {
                 logger.LogInformation($"{httpContext.Request.Path} is an authenticated route. AuthorizationMiddleware checking if client is authenticated");
                 var result = await httpContext.AuthenticateAsync(downstreamRoute.AuthenticationOptions.AuthenticationProviderKey);

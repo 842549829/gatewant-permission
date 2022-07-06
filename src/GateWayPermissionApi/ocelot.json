@@ -1,6 +1,5 @@
 {
   "Routes": [
-    /****************************门户*************************************/
     {
       "UpstreamPathTemplate": "/api/portal/account/{url}",
       "UpstreamHttpMethod": [
@@ -20,7 +19,7 @@
       "LoadBalancerOptions": {
         "Type": "RoundRobin"
       },
-      "Priority": 1
+      "Priority": 2
     },
     {
       "UpstreamPathTemplate": "/api/portal/{url}",
@@ -47,48 +46,19 @@
       "Priority": 1
     },
     {
-      "UpstreamPathTemplate": "/portal-doc/{url}",
-      "UpstreamHttpMethod": [
-        "Get"
-      ],
-      "DownstreamPathTemplate": "/portal-doc/{url}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "10.4.1.247",
-          "Port": 7000
-        }
-      ]
-    },
-    {
-      "UpstreamPathTemplate": "/swagger/portal/{url}",
-      "UpstreamHttpMethod": [
-        "Get"
-      ],
-      "DownstreamPathTemplate": "/swagger/portal/{url}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "10.4.1.247",
-          "Port": 7000
-        }
-      ]
-    },
-    /****************************运维*************************************/
-    {
-      "UpstreamPathTemplate": "/api/operate/{url}",
+      "UpstreamPathTemplate": "/api/{url}",
       "UpstreamHttpMethod": [
         "Get",
         "Post",
         "Put",
         "Delete"
       ],
-      "DownstreamPathTemplate": "/api/operate/{url}",
+      "DownstreamPathTemplate": "/api/{url}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "10.4.1.247",
-          "Port": 5015
+          "Port": 7000
         }
       ],
       "LoadBalancerOptions": {
@@ -97,156 +67,6 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "libra"
       }
-    },
-    {
-      "UpstreamPathTemplate": "/operate-doc/{url}",
-      "UpstreamHttpMethod": [
-        "Get"
-      ],
-      "DownstreamPathTemplate": "/{url}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "10.4.1.247",
-          "Port": 5015
-        }
-      ]
-    },
-    {
-      "UpstreamPathTemplate": "/swagger/operate/{url}",
-      "UpstreamHttpMethod": [
-        "Get"
-      ],
-      "DownstreamPathTemplate": "/swagger/operate/{url}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "10.4.1.247",
-          "Port": 5015
-        }
-      ]
-    },
-    {
-      "UpstreamPathTemplate": "/api/codeMatching/{url}",
-      "UpstreamHttpMethod": [
-        "Get",
-        "Post",
-        "Put",
-        "Delete",
-        "OPTIONS"
-      ],
-      "DownstreamPathTemplate": "/api/codeMatching/{url}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 20209
-        }
-      ],
-      "LoadBalancerOptions": {
-        "Type": "RoundRobin"
-      },
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "libra"
-      }
-    },
-    {
-      "UpstreamPathTemplate": "/signalr-hubs/codeMatching/{url}",
-      "UpstreamHttpMethod": [
-        "Get",
-        "Post",
-        "Put",
-        "Delete",
-        "OPTIONS"
-      ],
-      "DownstreamPathTemplate": "/signalr-hubs/codeMatching/{url}",
-      "DownstreamScheme": "ws",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 20209
-        }
-      ],
-      "LoadBalancerOptions": {
-        "Type": "RoundRobin"
-      }
-    },
-    {
-      "UpstreamPathTemplate": "/codeMatching-doc/{url}",
-      "UpstreamHttpMethod": [
-        "Get"
-      ],
-      "DownstreamPathTemplate": "/{url}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 20209
-        }
-      ]
-    },
-    {
-      "UpstreamPathTemplate": "/swagger/codeMatching/{url}",
-      "UpstreamHttpMethod": [
-        "Get"
-      ],
-      "DownstreamPathTemplate": "/swagger/codeMatching/{url}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 20209
-        }
-      ]
-    },
-    /****************************电子病历共享*************************************/
-    {
-      "UpstreamPathTemplate": "/api/emshare/{url}",
-      "UpstreamHttpMethod": [
-        "Get",
-        "Post",
-        "Put",
-        "Delete"
-      ],
-      "DownstreamPathTemplate": "/api/emshare/{url}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "127.0.0.1",
-          "Port": 20213
-        }
-      ],
-      "LoadBalancerOptions": {
-        "Type": "RoundRobin"
-      }
-    },
-    {
-      "UpstreamPathTemplate": "/emshare-doc/{url}",
-      "UpstreamHttpMethod": [
-        "Get"
-      ],
-      "DownstreamPathTemplate": "/{url}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "127.0.0.1",
-          "Port": 20213
-        }
-      ]
-    },
-    {
-      "UpstreamPathTemplate": "/swagger/emr-share/{url}",
-      "UpstreamHttpMethod": [
-        "Get"
-      ],
-      "DownstreamPathTemplate": "/swagger/emr-share/{url}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "127.0.0.1",
-          "Port": 20213
-        }
-      ]
     }
   ]
 }
