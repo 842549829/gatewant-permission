@@ -1,0 +1,11 @@
+﻿global using GateWayPermissionApi;
+global using GateWayPermissionApi.Extensions;
+global using IdentityServer4.AccessTokenValidation;
+global using Microsoft.AspNetCore.Authentication;
+global using Microsoft.AspNetCore.Diagnostics;
+global using Microsoft.AspNetCore.Mvc;
+global using NLog.Extensions.Logging;
+global using Ocelot.Authorization;
+global using Ocelot.DependencyInjection;
+global using Ocelot.Middleware;
+global using System.Text;

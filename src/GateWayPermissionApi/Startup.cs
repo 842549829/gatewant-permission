@@ -1,82 +1,93 @@
-﻿//#region .net5 写法
-//using GateWayPermissionApi.Extensions;
-//using Microsoft.AspNetCore.Diagnostics;
-//using NLog.Extensions.Logging;
-//using Ocelot.DependencyInjection;
-//using Ocelot.Middleware;
-//using System.Text;
+﻿namespace GateWayPermissionApi
+{
+    public class Startup
+    {
+        public Startup(ConfigurationManager configuration, ILoggingBuilder logging)
+        {
+            Configuration = configuration;
+            Logging = logging;
+        }
 
-//namespace GateWayPermissionApi
-//{
-//    public class Startup
-//    {
-//        public Startup(IConfiguration configuration)
-//        {
-//            Configuration = configuration;
-//        }
+        private ConfigurationManager Configuration { get; }
 
-//        private IConfiguration Configuration { get; }
+        private ILoggingBuilder Logging { get; }
 
-//        public void ConfigureServices(IServiceCollection services)
-//        {
-//            services.AddIdentityServer4(Configuration);
+        public void ConfigureServices(IServiceCollection services)
+        {
+            // 添加配置文件
+            Configuration
+                .AddJsonFile("appsettings.json", true, true)
+                .AddJsonFile("ocelot.json", true, true);
 
-//            services.AddOcelot();
+            // 添加网关
+            services.AddOcelot(Configuration);
 
-//            services.AddLogging(builder => { builder.AddNLog("NLog.config"); });
+            // 添加日志记录器
+            Logging
+                .AddConsole()
+                .AddNLog("NLog.config");
 
-//            // 跨域
-//            services.AddCors(options => options.AddPolicy("CorsPolicy", builder =>
-//            {
-//                builder.AllowAnyMethod()
-//                    .SetIsOriginAllowed(_ => true)
-//                    .AllowAnyHeader()
-//                    .AllowCredentials();
-//            }));
-//        }
+            // 跨域
+            services.AddCors(options => options.AddPolicy("CorsPolicy", corsPolicyBuilder =>
+            {
+                corsPolicyBuilder.AllowAnyMethod()
+                    .SetIsOriginAllowed(_ => true)
+                    .AllowAnyHeader()
+                    .AllowCredentials();
+            }));
 
-//        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
-//        {
-//            // 处理WebSockets Token
-//            app.Use((context, next) =>
-//            {
-//                if (context.Request.Query.TryGetValue("access_token", out var token)
-//                    && context.Request.Path.StartsWithSegments("/signalr-hubs"))
-//                    context.Request.Headers.Add("Authorization", $"Bearer {token}");
-//                return next.Invoke();
-//            });
+            //添加认证方式
+            services.AddIdentityServer4(Configuration);
+        }
 
+        public void Configure(WebApplication app)
+        {
+            // 处理WebSockets Token
+            app.Use((context, next) =>
+            {
+                if (context.Request.Query.TryGetValue("access_token", out var token)
+                    && context.Request.Path.StartsWithSegments("/signal-hubs"))
+                    context.Request.Headers.Add("Authorization", $"Bearer {token}");
+                return next.Invoke();
+            });
 
-//            //异常处理
-//            app.UseExceptionHandler(builder =>
-//            {
-//                builder.Run(async context =>
-//                {
-//                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-//                    context.Response.ContentType = "application/json";
-//                    var ex = context.Features.Get<IExceptionHandlerFeature>();
-//                    if (ex != null)
-//                    {
-//                        logger?.LogError(ex.Error, "网关错误");
-//                    }
-//                    await context.Response.WriteAsync("错误", encoding: Encoding.UTF8);
-//                });
-//            });
+            // WebSockets请求
+            app.UseWebSockets();
 
-//            // 鉴权
-//            app.UseAuthentication();
+            //异常拦截处理
+            app.UseExceptionHandler(applicationBuilder =>
+            {
+                applicationBuilder.Run(async context =>
+                {
+                    var logger = app.Logger;
+                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    context.Response.ContentType = "application/json";
+                    var ex = context.Features.Get<IExceptionHandlerFeature>();
+                    if (ex != null)
+                    {
+                        logger.LogError(ex.Error, "网关错误");
+                    }
+                    await context.Response.WriteAsync("错误", encoding: Encoding.UTF8);
+                });
+            });
 
-//            // 跨域
-//            app.UseCors("CorsPolicy");
+            // 跨域
+            app.UseCors("CorsPolicy");
 
-//            // WebSockets请求
-//            app.UseWebSockets();
+            // 身份认证
+            app.UseAuthentication();
 
-//            // http请求
-//            app.UseHttpsRedirection()
-//                .UseOcelot().Wait();
-//        }
-//    }
-//}
+            // 网关应用
+            app.UseOcelot(new OcelotPipelineConfiguration()
+            {
+                // 认证
+                AuthenticationMiddleware = GatewayExtension.AuthorizationMiddleware,
 
-//#endregion
+                // 权限认证
+                AuthorizationMiddleware = GatewayExtension.AuthorizationMiddleware
+            }).Wait();
+
+            app.Run();
+        }
+    }
+}

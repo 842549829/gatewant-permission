@@ -1,35 +1,27 @@
-﻿using IdentityServer4.AccessTokenValidation;
-using Microsoft.AspNetCore.Authentication;
-using Ocelot.Authorization;
-using Ocelot.Middleware;
-
-namespace GateWayPermissionApi.Extensions
+﻿namespace GateWayPermissionApi.Extensions
 {
     public static class GatewayExtension
     {
         public static IServiceCollection AddIdentityServer4(this IServiceCollection services, IConfiguration configuration)
         {
             //配置consul注册地址
-            services.Configure<IdentityServerOptions>(configuration.GetSection("IdentityServerOptions"));
-            var config = configuration.GetSection("IdentityServerOptions").Get<IdentityServerOptions>();
+            services.Configure<IdentityServerOptions>(configuration.GetSection("IdentityServer"));
+            var config = configuration.GetSection("IdentityServer").Get<IdentityServerOptions>();
             var identityBuilder = services.AddAuthentication(config.IdentityScheme);
-            if (config.Resources != null)
+            foreach (var resource in config.Resources)
             {
-                foreach (var resource in config.Resources)
+                identityBuilder.AddIdentityServerAuthentication(resource.Key, options =>
                 {
-                    identityBuilder.AddIdentityServerAuthentication(resource.Key, options =>
-                    {
-                        options.Authority = $"http://{config.IP}:{config.Port}";
-                        options.RequireHttpsMetadata = false;
-                        options.ApiName = resource.Name;
-                        options.SupportedTokens = SupportedTokens.Both;
-                    });
-                }
+                    options.Authority = $"http://{config.IP}:{config.Port}";
+                    options.RequireHttpsMetadata = false;
+                    options.ApiName = resource.Name;
+                    options.SupportedTokens = SupportedTokens.Both;
+                });
             }
             return services;
         }
 
-        public static async Task AuthorizationMiddleware(HttpContext httpContext, Func<Task> next) 
+        public static async Task AuthorizationMiddleware(HttpContext httpContext, Func<Task> next)
         {
             var logger = httpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("OcelotConfiguration");
             var downstreamRoute = httpContext.Items.DownstreamRoute();
@@ -37,8 +29,14 @@ namespace GateWayPermissionApi.Extensions
             {
                 logger.LogInformation($"{httpContext.Request.Path} is an authenticated route. AuthorizationMiddleware checking if client is authenticated");
                 var result = await httpContext.AuthenticateAsync(downstreamRoute.AuthenticationOptions.AuthenticationProviderKey);
-                httpContext.User = result.Principal;
-                if (httpContext.User.Identity.IsAuthenticated)
+                if (result.Principal != null)
+                {
+                    httpContext.User = result.Principal;
+                }
+                if (httpContext.User.Identity is
+                    {
+                        IsAuthenticated: true
+                    })
                 {
                     //TODO 权限拦截处理
                     if (httpContext.Request.Path == "/api")
@@ -55,11 +53,8 @@ namespace GateWayPermissionApi.Extensions
                 }
                 else
                 {
-                    var error = new UnauthenticatedError(
-                        $"Request for authenticated route {httpContext.Request.Path} by {httpContext.User.Identity.Name} was unauthenticated");
-
+                    var error = new UnauthenticatedError($"Request for authenticated route {httpContext.Request.Path} by {httpContext.User.Identity?.Name} was unauthenticated");
                     logger.LogWarning($"Client has NOT been authenticated for {httpContext.Request.Path} and pipeline error set. {error}");
-
                     httpContext.Items.SetError(error);
                 }
             }
